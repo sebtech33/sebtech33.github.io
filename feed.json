@@ -1,0 +1,41 @@
+{
+    "version": "https://jsonfeed.org/version/1",
+    "title": "Sebtech33",
+    "description": "",
+    "home_page_url": "https://sebtech33.github.io",
+    "feed_url": "https://sebtech33.github.io/feed.json",
+    "user_comment": "",
+    "author": {
+        "name": "Sebastian"
+    },
+    "items": [
+        {
+            "id": "https://sebtech33.github.io/testing-for-unraid/",
+            "url": "https://sebtech33.github.io/testing-for-unraid/",
+            "title": "Testing for unraid",
+            "summary": "Passthrough a keyboard/mouse to a vm whose os doesn't support usb and or to pass a ps2 keyboard/mouse on your server. (qemu 2.6 onwards) 1/. List your input devices by running this command ls /dev/input/by-id/ Will look simalar to the below usb-Logitech_USB_Receiver-event-if01@ usb-Logitech_USB_Receiver-if01-event-mouse@usb-Logitech_USB_Receiver-event-kbd@ usb-Logitech_USB_Receiver-if01-mouse@ 2/. run this command&hellip;",
+            "content_html": "<div>Passthrough a keyboard/mouse to a vm whose os doesn't support usb and or to pass a ps2 keyboard/mouse on your server.   (qemu 2.6 onwards)</div>\n<div> </div>\n<div> </div>\n<div>1/.</div>\n<div> </div>\n<div>List your input devices by running this command</div>\n<div> </div>\n<div> </div>\n<div>ls /dev/input/by-id/ </div>\n<div> </div>\n<div> </div>\n<div>Will look simalar to the below</div>\n<div> </div>\n<div>usb-Logitech_USB_Receiver-event-if01@  usb-Logitech_USB_Receiver-if01-event-mouse@</div>\n<div>usb-Logitech_USB_Receiver-event-kbd@   usb-Logitech_USB_Receiver-if01-mouse@</div>\n<div> </div>\n<div> </div>\n<div>2/.</div>\n<div> </div>\n<div>run this command then click buttons on keyboard etc</div>\n<div> </div>\n<div>cat /dev/input/by-id/usb-Logitech_USB_Receiver-event-kbd</div>\n<div> </div>\n<div>cat /dev/input/by-id/usb-Logitech_USB_Receiver-if01-event-mouse</div>\n<div> </div>\n<div> </div>\n<div>Do this for each device then press buttons on keyboard and move mouse and you should see</div>\n<div> </div>\n<div> </div>\n<div>3/.</div>\n<div> </div>\n<div>Next we need to add our input devices to the qemu conf file</div>\n<div> </div>\n<div>nano /etc/libvirt/qemu.conf</div>\n<div> </div>\n<div> </div>\n<div>use  (ctrl _ ) to goto line 451    </div>\n<div> </div>\n<div>find this part</div>\n<div> </div>\n<div>#cgroup_device_acl = [</div>\n<div>#    \"/dev/null\", \"/dev/full\", \"/dev/zero\",</div>\n<div>#    \"/dev/random\", \"/dev/urandom\",</div>\n<div>#    \"/dev/ptmx\", \"/dev/kvm\", \"/dev/kqemu\",</div>\n<div>#    \"/dev/rtc\",\"/dev/hpet\"</div>\n<div># ]</div>\n<div> </div>\n<div> </div>\n<div> </div>\n<div>Remove hashtags then add the parts in that you want to use</div>\n<div> </div>\n<div>cgroup_device_acl = [</div>\n<div>   \"/dev/null\", \"/dev/full\", \"/dev/zero\",</div>\n<div>   \"/dev/random\", \"/dev/urandom\",</div>\n<div>   \"/dev/ptmx\", \"/dev/kvm\", \"/dev/kqemu\",</div>\n<div>   \"/dev/rtc\",\"/dev/hpet\"</div>\n<div>   \"/dev/input/by-id/usb-Logitech_USB_Receiver-event-kbd\",</div>\n<div>   \"/dev/input/by-id/usb-Logitech_USB_Receiver-if01-event-mouse\",</div>\n<div>]</div>\n<div> </div>\n<div>########################################################################################################</div>\n<div>##### obviously change the   usb-Logitech_USB_Receiver-event-kbd   and   usb-Logitech_USB_Receiver-if01-event-mouse  to what the ids of your devices are.</div>\n<div>#########################################################################################################</div>\n<div> </div>\n<div> </div>\n<div>4/.</div>\n<div> </div>\n<div>Reboot server for changes to take effect</div>\n<div> </div>\n<div> </div>\n<div>5/.</div>\n<div> </div>\n<div>Next at bottom of vm xml</div>\n<div> </div>\n<div>Remove line </div>\n<div> </div>\n<div>&lt;/domain&gt;</div>\n<div> </div>\n<div>Replace with</div>\n<div> </div>\n<div> </div>\n<div> </div>\n<div>&lt;qemu:commandline&gt;</div>\n<div>&lt;qemu:arg value='-object'/&gt;</div>\n<div>&lt;qemu:arg value='input-linux,id=kbd,evdev=/dev/input/by-id/xxxxyourkeyboardidxxxxxxxx,grab_all=on,repeat=on'/&gt;</div>\n<div>&lt;qemu:arg value='-object'/&gt;</div>\n<div>&lt;qemu:arg value='input-linux,id=mouse,evdev=/dev/input/by-id/xxxxxxxxyourmouseidxxxxxxxx'/&gt;</div>\n<div>&lt;/qemu:commandline&gt;</div>\n<div>&lt;/domain&gt;</div>\n<div> </div>\n<div>for example mine looked like the below</div>\n<div> </div>\n<div>&lt;qemu:commandline&gt;</div>\n<div>&lt;qemu:arg value='-object'/&gt;</div>\n<div>&lt;qemu:arg value='input-linux,id=kbd,evdev=/dev/input/by-id/usb-Logitech_USB_Receiver-event-kbd,grab_all=on,repeat=on'/&gt;</div>\n<div>&lt;qemu:arg value='-object'/&gt;</div>\n<div>&lt;qemu:arg value='input-linux,id=mouse,evdev=/dev/input/by-id/usb-Logitech_USB_Receiver-if01-event-mouse'/&gt;</div>\n<div>&lt;/qemu:commandline&gt;</div>\n<div>&lt;/domain&gt;</div>\n<div> </div>\n<div> </div>\n<div>6/.</div>\n<div>(optional) add keyboard/mouse as virtio devices by adding the below to the xml</div>\n<div> </div>\n<div>&lt;input type='keyboard' bus='virtio'&gt;</div>\n<div>&lt;/input&gt;</div>\n<div>&lt;input type='mouse' bus='virtio'&gt;</div>\n<div>&lt;/input&gt;</div>\n<div> </div>",
+            "image": "https://sebtech33.github.io/media/posts/2/528px-Qemu_logo.svg.png",
+            "author": {
+                "name": "Sebastian"
+            },
+            "tags": [
+                   "Unraid"
+            ],
+            "date_published": "2020-09-09T23:38:03+02:00",
+            "date_modified": "2020-09-09T23:38:03+02:00"
+        },
+        {
+            "id": "https://sebtech33.github.io/test/",
+            "url": "https://sebtech33.github.io/test/",
+            "title": "test",
+            "author": {
+                "name": "Sebastian"
+            },
+            "tags": [
+            ],
+            "date_published": "2020-09-09T22:29:17+02:00",
+            "date_modified": "2020-09-09T22:29:17+02:00"
+        }
+    ]
+}
